@@ -21,6 +21,7 @@ fn main() {
     let solver = match args.day {
         1 => day1,
         2 => advent2022::day2,
+        3 => advent2022::day3,
         _ => panic!("Invalid day"),
     };
 
