@@ -22,6 +22,7 @@ fn main() {
         1 => day1,
         2 => advent2022::day2,
         3 => advent2022::day3,
+        4 => advent2022::day4,
         _ => panic!("Invalid day"),
     };
 
