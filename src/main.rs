@@ -1,11 +1,10 @@
 use std::io;
 use std::io::Read;
 use clap::Parser;
-use advent2022::day1;
 
 #[derive(Parser, Debug)]
 struct Args {
-    day: i32,
+    day: usize,
 }
 
 fn read_input() -> String {
@@ -17,15 +16,15 @@ fn read_input() -> String {
 
 fn main() {
     let args = Args::parse();
+    let solvers = [
+        advent2022::day1,
+        advent2022::day2,
+        advent2022::day3,
+        advent2022::day4,
+        advent2022::day5,
+    ];
 
-    let solver = match args.day {
-        1 => day1,
-        2 => advent2022::day2,
-        3 => advent2022::day3,
-        4 => advent2022::day4,
-        _ => panic!("Invalid day"),
-    };
-
+    let solver = solvers[args.day - 1];
     let input = read_input();
     solver(&input);
 }
