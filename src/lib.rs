@@ -1,10 +1,17 @@
+use nom::{
+    branch::alt,
+    bytes::complete::tag,
+    character::{
+        complete::{alpha1, char, line_ending, satisfy},
+        is_alphabetic,
+    },
+    combinator::{map_res, value},
+    sequence::delimited,
+    IResult,
+};
 use regex::Regex;
-use std::collections::binary_heap::Iter;
-use std::collections::HashSet;
 use std::ops::Range;
-use std::str::Chars;
-use std::str::FromStr;
-use std::mem::swap;
+use std::{collections::HashSet, hash::Hash};
 
 pub fn day1(input: &str) {
     let mut calories: Vec<i32> = input
@@ -138,6 +145,18 @@ pub fn day4(input: &str) {
     println!("{}", overlaps);
 }
 
+fn crate_parser(input: &str) -> IResult<&str, char> {
+    alt((crate_value, empty_crate))(input)
+}
+
+fn empty_crate(input: &str) -> IResult<&str, char> {
+    value(' ', tag("   "))(input)
+}
+
+fn crate_value(input: &str) -> IResult<&str, char> {
+    delimited(char('['), satisfy(|c| c.is_alphabetic()), char(']'))(input)
+}
+
 fn parse_crate<I: Iterator>(inp: &mut I) -> Option<I::Item> {
     let mut res = None;
     for i in 0..3 {
@@ -200,20 +219,52 @@ pub fn day5(input: &str) {
     for inst in &insts {
         let (n, from, to) = inst;
 
-        let end = bcrates[from-1].len();
+        let end = bcrates[from - 1].len();
         let start = end - n;
-        let moved: Vec<_> = bcrates[from-1][start..end].iter().cloned().rev().collect();
-        bcrates[to-1].extend_from_slice(moved.as_slice());
-        bcrates[from-1].truncate(start);
+        let moved: Vec<_> = bcrates[from - 1][start..end]
+            .iter()
+            .cloned()
+            .rev()
+            .collect();
+        bcrates[to - 1].extend_from_slice(moved.as_slice());
+        bcrates[from - 1].truncate(start);
 
-        let moved: Vec<_> = crates9001[from-1][start..end].to_vec();
-        crates9001[to-1].extend_from_slice(&moved);
-        crates9001[from-1].truncate(start);
+        let moved: Vec<_> = crates9001[from - 1][start..end].to_vec();
+        crates9001[to - 1].extend_from_slice(&moved);
+        crates9001[from - 1].truncate(start);
     }
 
-
-    let solt = bcrates.iter().map(|v| v.last().unwrap()).cloned().collect::<String>();
+    let solt = bcrates
+        .iter()
+        .map(|v| v.last().unwrap())
+        .cloned()
+        .collect::<String>();
     println!("{}", solt);
-    let solt2 = crates9001.iter().map(|v| v.last().unwrap()).cloned().collect::<String>();
+    let solt2 = crates9001
+        .iter()
+        .map(|v| v.last().unwrap())
+        .cloned()
+        .collect::<String>();
+    println!("{}", solt2);
+}
+
+pub fn day6(input: &str) {
+    fn find_first_uniq(xs: &[char], n: usize) -> Option<usize> {
+        let (m, _) = xs
+            .windows(n)
+            .enumerate()
+            .find(|(_, s)| s.iter().collect::<HashSet<_>>().len() == n)?;
+        Some(m + n)
+    }
+
+    let xs = input
+        .trim()
+        .chars()
+        .collect::<Vec<_>>();
+
+    let solt1 = find_first_uniq(&xs, 4).unwrap();
+    println!("{}", solt1);
+
+    let solt2 = find_first_uniq(&xs, 14).unwrap();
     println!("{}", solt2);
 }
