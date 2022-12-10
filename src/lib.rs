@@ -1,3 +1,5 @@
+use anyhow::Result;
+use itertools::Itertools;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -13,11 +15,12 @@ use regex::Regex;
 use std::{
     cell::Cell,
     collections::{HashMap, HashSet},
+    iter,
     path::{Path, PathBuf},
 };
 use std::{ops::Range, str::Lines};
 
-pub fn day1(input: &str) {
+pub fn day1(input: &str) -> Result<()> {
     let mut calories: Vec<i32> = input
         .split("\r\n\r\n")
         .map(|elf| elf.lines().map(|food| food.parse::<i32>().unwrap()).sum())
@@ -29,9 +32,10 @@ pub fn day1(input: &str) {
     // Part 2
     calories.sort();
     println!("{}", calories.iter().rev().take(3).sum::<i32>());
+    Ok(())
 }
 
-pub fn day2(input: &str) {
+pub fn day2(input: &str) -> Result<()> {
     let game = [
         [1 + 3, 2 + 6, 3 + 0], // A
         [1 + 0, 2 + 3, 3 + 6], // B
@@ -67,13 +71,14 @@ pub fn day2(input: &str) {
         .sum::<i32>();
 
     println!("{}", score2);
+    Ok(())
 }
 
 fn ord(x: char) -> u32 {
     x.into()
 }
 
-pub fn day3(input: &str) {
+pub fn day3(input: &str) -> Result<()> {
     let xs = input
         .lines()
         .map(|bag| {
@@ -113,9 +118,10 @@ pub fn day3(input: &str) {
         .map(|&x| prioritize(x))
         .sum();
     println!("{}", solt2);
+    Ok(())
 }
 
-pub fn day4(input: &str) {
+pub fn day4(input: &str) -> Result<()> {
     let ids: Vec<_> = input
         .lines()
         .map(|xs| {
@@ -147,6 +153,7 @@ pub fn day4(input: &str) {
         })
         .count();
     println!("{}", overlaps);
+    Ok(())
 }
 
 fn crate_parser(input: &str) -> IResult<&str, char> {
@@ -174,7 +181,7 @@ fn parse_crate<I: Iterator>(inp: &mut I) -> Option<I::Item> {
     res
 }
 
-pub fn day5(input: &str) {
+pub fn day5(input: &str) -> Result<()> {
     let parts: Vec<_> = input.split("\r\n\r\n").collect();
 
     let mut crates: Vec<_> = parts[0]
@@ -250,9 +257,10 @@ pub fn day5(input: &str) {
         .cloned()
         .collect::<String>();
     println!("{}", solt2);
+    Ok(())
 }
 
-pub fn day6(input: &str) {
+pub fn day6(input: &str) -> Result<()> {
     fn find_first_uniq(xs: &[char], n: usize) -> Option<usize> {
         let (m, _) = xs
             .windows(n)
@@ -268,6 +276,7 @@ pub fn day6(input: &str) {
 
     let solt2 = find_first_uniq(&xs, 14).unwrap();
     println!("{}", solt2);
+    Ok(())
 }
 
 fn dir_size(tree: &HashMap<PathBuf, Vec<Vec<&str>>>, d: &PathBuf) -> usize {
@@ -285,7 +294,26 @@ fn dir_size(tree: &HashMap<PathBuf, Vec<Vec<&str>>>, d: &PathBuf) -> usize {
         + sz
 }
 
-pub fn day7(input: &str) {
+trait Unwrap {
+    type T;
+    fn u(self) -> Self::T;
+}
+
+impl<U> Unwrap for Option<U> {
+    type T = U;
+    fn u(self) -> Self::T {
+        self.unwrap()
+    }
+}
+
+impl<U, E: std::fmt::Debug> Unwrap for std::result::Result<U, E> {
+    type T = U;
+    fn u(self) -> Self::T {
+        self.unwrap()
+    }
+}
+
+pub fn day7(input: &str) -> Result<()> {
     let cd = Regex::new(r"\$ cd (.*)").unwrap();
     let mut cur_dir = PathBuf::new();
     cur_dir.push("/");
@@ -321,10 +349,286 @@ pub fn day7(input: &str) {
     println!("{}", solt1);
 
     let free = 70000000 - szs.get(&PathBuf::from("/")).unwrap();
-    let solt2 = szs
-        .values()
-        .filter(|&x| x + free >= 30000000)
-        .min()
-        .unwrap();
+    let solt2 = szs.values().filter(|&x| x + free >= 30000000).min().u();
     println!("{}", solt2);
+
+    Ok(())
+}
+
+pub fn day8(input: &str) -> Result<()> {
+    let ts: Vec<_> = input
+        .lines()
+        .map(|l| {
+            l.chars()
+                .map(|c| c.to_digit(10).unwrap() as i32)
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+
+    let n = ts.len();
+    let m = ts[0].len();
+    // n x m
+    let mut see = HashSet::new();
+    for i in 0..m {
+        let mut seen: i32 = -1;
+        // Up
+        for j in 0..n - 1 {
+            if ts[j][i] > seen {
+                see.insert((j, i));
+                seen = ts[j][i];
+            }
+        }
+        // Down
+        seen = -1;
+        for j in (1..n).rev() {
+            if ts[j][i] > seen {
+                see.insert((j, i));
+                seen = ts[j][i];
+            }
+        }
+    }
+    for j in 0..n {
+        let mut seen = -1;
+        // Left
+        for i in 0..m - 1 {
+            if ts[j][i] > seen {
+                see.insert((j, i));
+                seen = ts[j][i];
+            }
+        }
+        // Right
+        seen = -1;
+        for i in (1..m).rev() {
+            if ts[j][i] > seen {
+                see.insert((j, i));
+                seen = ts[j][i];
+            }
+        }
+    }
+
+    println!("{}", see.len());
+
+    let dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)];
+    let mut scores = Vec::new();
+    for (i, r) in ts.iter().enumerate() {
+        for (j, c) in r.iter().enumerate() {
+            let mut score = 1;
+            for d in &dirs {
+                let mut p = (i as i32 + d.0, j as i32 + d.1);
+                let mut x = 0;
+                while p.0 >= 0 && p.0 < n as i32 && p.1 >= 0 && p.1 < m as i32 {
+                    x += 1;
+                    if ts[p.0 as usize][p.1 as usize] >= *c {
+                        break;
+                    }
+
+                    p = (p.0 + d.0, p.1 + d.1);
+                }
+                score *= x;
+            }
+            scores.push(score);
+        }
+    }
+    println!("{}", scores.iter().max().unwrap());
+
+    Ok(())
+}
+
+fn paths(xs: &Vec<Vec<i32>>, p: &(usize, usize)) -> impl Iterator {
+    let m = xs.len();
+    let n = xs[0].len();
+    let (i, j) = *p;
+    (i + 1..m)
+        .map(move |a| (a, j))
+        .chain((0..i).rev().map(move |a| (a, j)))
+        .chain((j + 1..n).map(move |a| (i, a)))
+        .chain((0..j).rev().map(move |a| (i, a)))
+}
+
+type Pair<T> = (T, T);
+fn t_add(xs: Pair<i32>, ys: Pair<i32>) -> Pair<i32> {
+    (xs.0 + ys.0, xs.1 + ys.1)
+}
+fn t_sub(xs: Pair<i32>, ys: Pair<i32>) -> Pair<i32> {
+    (xs.0 - ys.0, xs.1 - ys.1)
+}
+fn norm(x: i32) -> i32 {
+    if x != 0 {
+        x / x.abs()
+    } else {
+        x
+    }
+}
+
+pub fn day9(input: &str) -> Result<()> {
+    let cmds: Vec<_> = input
+        .lines()
+        .map(|x| {
+            let (d, n) = x.split_whitespace().collect_tuple().unwrap();
+            (d, n.parse::<usize>().unwrap())
+        })
+        .collect();
+
+    let mut h_pos = (0, 0);
+    let mut t_pos = (0, 0);
+    let mut seen = HashSet::new();
+    seen.insert(t_pos);
+    for (d, n) in &cmds {
+        let m = match *d {
+            "U" => (0, 1),
+            "R" => (1, 0),
+            "D" => (0, -1),
+            "L" => (-1, 0),
+            _ => unreachable!(),
+        };
+        for _ in 0..*n {
+            let old_pos = h_pos;
+            h_pos = t_add(h_pos, m);
+            if h_pos.0.abs_diff(t_pos.0) > 1 || h_pos.1.abs_diff(t_pos.1) > 1 {
+                t_pos = old_pos;
+                seen.insert(t_pos);
+            }
+        }
+    }
+    println!("{}", seen.len());
+
+    let mut ts = vec![(0, 0); 10];
+    let mut seen = HashSet::new();
+    seen.insert((0, 0));
+    for (d, n) in &cmds {
+        let m = match *d {
+            "U" => (0, 1),
+            "R" => (1, 0),
+            "D" => (0, -1),
+            "L" => (-1, 0),
+            _ => unreachable!(),
+        };
+        for _ in 0..*n {
+            let l = ts.len();
+            let mut h = 0;
+            let mut c = m;
+            let mut old_pos = ts[0];
+            ts[0] = t_add(ts[0], c);
+            for t in 1..l {
+                let v = ts[t];
+                if ts[h].0.abs_diff(ts[t].0) > 1 && ts[h].1.abs_diff(ts[t].1) > 1 {
+                    ts[t].0 = ts[h].0 - (ts[h].0 - ts[t].0).signum();
+                    ts[t].1 = ts[h].1 - (ts[h].1 - ts[t].1).signum();
+                }
+                if ts[h].0.abs_diff(ts[t].0) > 1 {
+                    ts[t].0 = ts[h].0 - (ts[h].0 - ts[t].0).signum();
+                    ts[t].1 = ts[h].1;
+                } else if ts[h].1.abs_diff(ts[t].1) > 1 {
+                    ts[t].0 = ts[h].0;
+                    ts[t].1 = ts[h].1 - (ts[h].1 - ts[t].1).signum();
+                }
+                old_pos = v;
+                h = t;
+            }
+            seen.insert(*ts.last().unwrap());
+        }
+        println!("{:?}", ts);
+    }
+    println!("{}", seen.len());
+    Ok(())
+}
+
+enum Op {
+    Noop,
+    Addx(i32),
+}
+
+struct Program(Vec<Op>);
+
+impl Program {
+    fn run(&self) -> Vec<i32> {
+        let mut x = 1;
+        let mut n = 1;
+        let mut states = vec![x];
+        for i in &self.0 {
+            match *i {
+                Op::Noop => {
+                    states.push(x);
+                }
+                Op::Addx(a) => {
+                    states.push(x);
+                    x += a;
+                    states.push(x);
+                    n += 2;
+                }
+            }
+        }
+        states
+    }
+
+    fn render(&self) -> Vec<char> {
+        let mut x: i32 = 1;
+        let mut n = 0;
+        let mut states = iter::repeat('.').take(40 * 6).collect::<Vec<_>>();
+        let mut draw = |z, x: i32| {
+            let m = z % 40;
+            if (x % 40).abs_diff(m) < 2 {
+                states[z as usize] = '#';
+            }
+        };
+        for i in &self.0 {
+            match *i {
+                Op::Noop => {
+                    draw(n, x);
+                    n += 1;
+                }
+                Op::Addx(a) => {
+                    draw(n, x);
+                    n += 1;
+                    draw(n, x);
+                    x += a;
+                    n += 1;
+                }
+            }
+        }
+        states
+    }
+}
+
+pub fn day10(input: &str) -> Result<()> {
+    let prog = Program(
+        input
+            .lines()
+            .map(|l| {
+                if l == "noop" {
+                    Op::Noop
+                } else {
+                    let (_, i) = l.split_whitespace().collect_tuple().unwrap();
+                    Op::Addx(i.parse::<i32>().unwrap())
+                }
+            })
+            .collect_vec(),
+    );
+
+    let states = prog.run();
+    let part1: i32 = [20, 60, 100, 140, 180, 220]
+        .into_iter()
+        .map(|&i| states[i - 1] * (i as i32))
+        .sum();
+    println!("{}", part1);
+    let part2 = prog.render();
+    part2
+        .as_slice()
+        .chunks(40)
+        .for_each(|l| println!("{}", l.iter().collect::<String>()));
+
+    Ok(())
+}
+
+#[test]
+fn test_it() {
+    let i = "R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20";
+    day9(i);
 }

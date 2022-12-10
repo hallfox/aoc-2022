@@ -24,9 +24,12 @@ fn main() {
         advent2022::day5,
         advent2022::day6,
         advent2022::day7,
+        advent2022::day8,
+        advent2022::day9,
+        advent2022::day10,
     ];
 
     let solver = solvers[args.day - 1];
     let input = read_input();
-    solver(&input);
+    solver(&input).unwrap();
 }
