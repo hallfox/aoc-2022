@@ -1,22 +1,18 @@
-use std::{
-    cmp::Ordering,
-    collections::{BinaryHeap, HashMap, HashSet, VecDeque},
-    str::FromStr,
-};
+use std::{cmp::Ordering, str::FromStr};
 
 use anyhow::Result;
 use itertools::Itertools;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{i32, one_of},
+    character::complete::i32,
     combinator::{map, opt},
-    multi::{many0, many1},
+    multi::many0,
     sequence::{delimited, terminated},
     Finish, IResult,
 };
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 enum Packet {
     Int(i32),
     List(Vec<Packet>),
@@ -64,24 +60,27 @@ impl Packet {
     fn vec_of_int(x: i32) -> Self {
         Packet::List(vec![Packet::Int(x)])
     }
+}
 
-    fn cmp(&self, other: &Self) -> Ordering {
+impl PartialOrd for Packet {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match (self, other) {
-            (Packet::Int(i), Packet::Int(j)) => i.cmp(j),
-            (Packet::List(_), Packet::Int(j)) => self.cmp(&Packet::vec_of_int(*j)),
-            (Packet::Int(i), Packet::List(_)) => Packet::vec_of_int(*i).cmp(other),
-            (Packet::List(l1), Packet::List(l2)) => {
-                let x = l1
-                    .iter()
-                    .zip(l2.iter())
-                    .map(|(p1, p2)| p1.cmp(p2))
-                    .find(|o| *o != Ordering::Equal);
-                match x {
-                    Some(o) => o,
-                    None => l1.len().cmp(&l2.len()),
-                }
-            }
+            (Packet::Int(i), Packet::Int(j)) => i.partial_cmp(j),
+            (Packet::List(_), Packet::Int(j)) => self.partial_cmp(&Packet::vec_of_int(*j)),
+            (Packet::Int(i), Packet::List(_)) => Packet::vec_of_int(*i).partial_cmp(other),
+            (Packet::List(l1), Packet::List(l2)) => l1
+                .iter()
+                .zip(l2.iter())
+                .map(|(p1, p2)| p1.cmp(p2))
+                .find(|o| *o != Ordering::Equal)
+                .or_else(|| l1.len().partial_cmp(&l2.len())),
         }
+    }
+}
+
+impl Ord for Packet {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.partial_cmp(other).unwrap()
     }
 }
 
@@ -109,7 +108,7 @@ impl Data {
         let (p1, p2): (Vec<_>, Vec<_>) = self.packets.iter().cloned().unzip();
         let mut all_ps = divs.iter().chain(p1.iter()).chain(p2.iter()).collect_vec();
 
-        all_ps.sort_by(|p1, p2| p1.cmp(p2));
+        all_ps.sort();
         divs.iter()
             .map(|p| all_ps.iter().enumerate().find(|t| *t.1 == p).unwrap().0 + 1)
             .product()

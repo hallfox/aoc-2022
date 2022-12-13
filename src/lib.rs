@@ -1,26 +1,24 @@
 use anyhow::Result;
-use cached::proc_macro::cached;
+
 use itertools::Itertools;
 use nom::{
     branch::alt,
     bytes::complete::tag,
     character::{
-        complete::{alpha1, char, line_ending, satisfy},
-        is_alphabetic,
+        complete::{char, satisfy},
     },
-    combinator::{map_res, value},
+    combinator::{value},
     sequence::delimited,
     IResult,
 };
-use num::BigInt;
+
 use regex::Regex;
 use std::{
-    cell::Cell,
-    collections::{vec_deque, HashMap, HashSet, VecDeque},
+    collections::{HashMap, HashSet, VecDeque},
     iter,
-    path::{Path, PathBuf},
+    path::{PathBuf},
 };
-use std::{ops::Range, str::Lines};
+use std::{ops::Range};
 
 mod solutions;
 pub use solutions::{day12, day13};
@@ -42,9 +40,9 @@ pub fn day1(input: &str) -> Result<()> {
 
 pub fn day2(input: &str) -> Result<()> {
     let game = [
-        [1 + 3, 2 + 6, 3 + 0], // A
-        [1 + 0, 2 + 3, 3 + 6], // B
-        [1 + 6, 2 + 0, 3 + 3], // C
+        [1 + 3, 2 + 6, 3], // A
+        [1, 2 + 3, 3 + 6], // B
+        [1 + 6, 2, 3 + 3], // C
     ];
     let plays: Vec<_> = input
         .lines()
@@ -94,7 +92,7 @@ pub fn day3(input: &str) -> Result<()> {
             let b2: HashSet<_> = s2.chars().collect();
             *b1.intersection(&b2)
                 .next()
-                .expect(&format!("Missing common string {:?} {:?}", s1, s2))
+                .unwrap_or_else(|| panic!("Missing common string {:?} {:?}", s1, s2))
         })
         .collect::<Vec<_>>();
 
@@ -118,7 +116,7 @@ pub fn day3(input: &str) -> Result<()> {
                 .iter()
                 .filter(|&x| arrs[1].contains(x))
                 .find(|&x| arrs[2].contains(x))
-                .expect(&format!("Missing common string {:?}", arrs))
+                .unwrap_or_else(|| panic!("Missing common string {:?}", arrs))
         })
         .map(|&x| prioritize(x))
         .sum();
@@ -511,7 +509,7 @@ pub fn day9(input: &str) -> Result<()> {
         for _ in 0..*n {
             let l = ts.len();
             let mut h = 0;
-            let mut c = m;
+            let c = m;
             let mut old_pos = ts[0];
             ts[0] = t_add(ts[0], c);
             for t in 1..l {
@@ -688,7 +686,7 @@ impl MonkeyBusiness for Vec<Monkey> {
     }
 }
 
-fn monkey_business_1(mut ms: Vec<Monkey>) -> u128 {
+fn monkey_business_1(ms: Vec<Monkey>) -> u128 {
     ms.monkey_business(20, |worry, oper| {
         let worry = match oper {
             Oper::Add(x) => worry + (*x as u128),
@@ -700,7 +698,7 @@ fn monkey_business_1(mut ms: Vec<Monkey>) -> u128 {
     })
 }
 
-fn monkey_business_2(mut ms: Vec<Monkey>) -> u128 {
+fn monkey_business_2(ms: Vec<Monkey>) -> u128 {
     let z: u128 = ms.iter().map(|m| m.test as u128).product();
     ms.monkey_business(10000, |worry, oper| match oper {
         Oper::Add(x) => (worry + (*x as u128)) % z,
