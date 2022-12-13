@@ -27,6 +27,9 @@ fn main() {
         advent2022::day8,
         advent2022::day9,
         advent2022::day10,
+        advent2022::day11,
+        advent2022::day12,
+        advent2022::day13,
     ];
 
     let solver = solvers[args.day - 1];
