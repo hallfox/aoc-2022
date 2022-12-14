@@ -71,7 +71,7 @@ impl PartialOrd for Packet {
             (Packet::List(l1), Packet::List(l2)) => l1
                 .iter()
                 .zip(l2.iter())
-                .map(|(p1, p2)| p1.cmp(p2))
+                .flat_map(|(p1, p2)| p1.partial_cmp(p2))
                 .find(|o| *o != Ordering::Equal)
                 .or_else(|| l1.len().partial_cmp(&l2.len())),
         }
