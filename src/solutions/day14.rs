@@ -1,16 +1,8 @@
-use std::{cmp::Ordering, str::FromStr};
+use std::{str::FromStr};
 
 use anyhow::Result;
 use itertools::Itertools;
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::i32,
-    combinator::{map, opt},
-    multi::many0,
-    sequence::{delimited, terminated},
-    Finish, IResult,
-};
+
 
 type Point = (usize, usize);
 
@@ -28,7 +20,7 @@ impl FromStr for Data {
             .map(|l| {
                 l.split(" -> ")
                     .map(|p| {
-                        p.split(",")
+                        p.split(',')
                             .map(|a| a.parse::<usize>().unwrap())
                             .collect_tuple()
                             .unwrap()
@@ -190,7 +182,7 @@ fn fill_floor(mut grid: Grid) -> usize {
 pub fn day14(input: &str) -> Result<()> {
     let data = input.parse::<Data>()?;
     //println!("{:?}", data);
-    let mut grid = data.draw_grid();
+    let grid = data.draw_grid();
     //println!("{:?}", grid);
     //println!("{}", fill_sand(grid.clone()));
     println!("{}", fill_floor(grid));

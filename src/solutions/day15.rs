@@ -1,17 +1,9 @@
-use std::{cmp::Ordering, collections::HashSet, str::FromStr};
+use std::{collections::HashSet, str::FromStr};
 
 use anyhow::Result;
 use itertools::Itertools;
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::i32,
-    combinator::{map, opt},
-    multi::many0,
-    sequence::{delimited, terminated},
-    Finish, IResult,
-};
-use rayon::{array::IntoIter, prelude::*};
+
+use rayon::{prelude::*};
 
 #[derive(Debug, Clone)]
 struct Data {
@@ -47,11 +39,11 @@ fn dist(a: Point, b: Point) -> usize {
 }
 
 fn part1(data: &Data, y: isize) -> usize {
-    let bound = {
+    let _bound = {
         let mut width = 0;
         let mut left = 0;
         let mut d = 0;
-        for (p1 @ (x1, y1), p2 @ (x2, y2)) in &data.data {
+        for (p1 @ (x1, _y1), p2 @ (x2, _y2)) in &data.data {
             width = width.max(*x1).max(*x2);
             left = left.min(*x1).min(*x2);
             d = d.max(dist(*p1, *p2));
@@ -62,9 +54,9 @@ fn part1(data: &Data, y: isize) -> usize {
     let occ = data
         .data
         .iter()
-        .map(|(p1, p2)| p2)
+        .map(|(_p1, p2)| p2)
         .cloned()
-        .chain(data.data.iter().map(|(p1, p2)| p1).cloned())
+        .chain(data.data.iter().map(|(p1, _p2)| p1).cloned())
         .collect::<HashSet<_>>();
 
     let mut candidates = Vec::new();

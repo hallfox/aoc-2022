@@ -1,6 +1,5 @@
 use std::{
-    cmp::Ordering,
-    collections::{BTreeSet, HashMap, HashSet},
+    collections::{HashMap},
     str::FromStr,
 };
 
@@ -9,17 +8,9 @@ use itertools::{
     FoldWhile::{Continue, Done},
     Itertools,
 };
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::i32,
-    combinator::{map, opt},
-    multi::many0,
-    sequence::{delimited, terminated},
-    Finish, IResult,
-};
+
 use rayon::prelude::*;
-use regex::Regex;
+
 
 #[derive(Debug, Clone, Hash)]
 struct Data {

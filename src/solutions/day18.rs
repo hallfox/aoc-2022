@@ -1,24 +1,14 @@
 use std::{
-    cmp::Ordering,
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
+    collections::{HashSet, VecDeque},
     str::FromStr,
 };
 
 use anyhow::Result;
 use itertools::Itertools;
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::i32,
-    combinator::{map, opt},
-    multi::many0,
-    sequence::{delimited, terminated},
-    Finish, IResult,
-};
-use petgraph::{prelude::*, visit};
+
+
 use rayon::prelude::*;
-use regex::Regex;
+
 
 #[derive(Debug, Clone)]
 struct Data {

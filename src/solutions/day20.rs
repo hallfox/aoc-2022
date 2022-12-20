@@ -1,25 +1,9 @@
 use std::{
-    cmp::Ordering,
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
+    collections::{VecDeque},
     str::FromStr,
 };
-
 use anyhow::Result;
-use cached::proc_macro::cached;
-use itertools::Itertools;
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::i64,
-    combinator::{map, opt},
-    multi::many0,
-    sequence::{delimited, terminated},
-    Finish, IResult,
-};
-use petgraph::{prelude::*, visit};
-use rayon::prelude::*;
-use regex::Regex;
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct Data {

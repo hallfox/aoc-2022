@@ -1,25 +1,14 @@
 use std::{
-    cmp::Ordering,
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
     str::FromStr,
 };
 
 use anyhow::Result;
 use cached::proc_macro::cached;
 use itertools::Itertools;
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::i32,
-    combinator::{map, opt},
-    multi::many0,
-    sequence::{delimited, terminated},
-    Finish, IResult,
-};
-use petgraph::{prelude::*, visit};
+
+
 use rayon::prelude::*;
-use regex::Regex;
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct Blueprint {
@@ -159,7 +148,7 @@ fn run_mine(blu: Blueprint, m: Mine, n: i32) -> i32 {
     let b = b + br;
     let g = g + gr;
     let xn = run_mine(
-        blu.clone(),
+        blu,
         Mine {
             ss: (o, c, b, g),
             ..m
@@ -196,7 +185,7 @@ fn best_three(d: &Data) -> i32 {
     d.d.iter()
         .take(3)
         .enumerate()
-        .map(|(i, b)| b.geodes(32))
+        .map(|(_i, b)| b.geodes(32))
         .product()
 }
 
