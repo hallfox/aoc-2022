@@ -36,6 +36,7 @@ fn main() {
         advent2022::day17,
         advent2022::day18,
         advent2022::day19,
+        advent2022::day20,
     ];
 
     let solver = solvers[args.day - 1];

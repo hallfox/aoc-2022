@@ -186,7 +186,7 @@ impl Data {
                             let m = (
                                 g.i as usize % self.dirs.len(),
                                 *r,
-                                g.rocks[(hn - 30).max(0) as usize..hn as usize].to_owned(),
+                                g.rocks[(hn - 6).max(0) as usize..hn as usize].to_owned(),
                             );
                             if let Some(old) = pats.get(&m) {
                                 let (old_n, old_h) = old;
