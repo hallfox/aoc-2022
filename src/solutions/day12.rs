@@ -45,43 +45,6 @@ impl Ord for Weight {
     }
 }
 
-// fn garbage()
-//     let mut visited = HashSet::new();
-//     let mut weights = vec![vec![None; c_l as usize]; r_l as usize];
-//     let mut stack = BinaryHeap::new();
-//     let mut steps = 0;
-//     weights.insert(start, RefCell::new(Weight { pos: start, w: 0 }));
-//     stack.push(weights.get_mut(&start).unwrap());
-//     while let Some(w) = stack.pop() {
-//         let p @ (r, c) = w.borrow().pos;
-//         let z = map[r as usize][c as usize];
-//         visited.insert(p);
-//         let neighs = [(r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)];
-//         let to_visit = neighs.iter().filter_map(|(r, c)| {
-//             if *r >= 0 && *r < r_l && *c >= 0 && *c < c_l {
-//                 let z1 = map[*r as usize][*c as usize];
-//                 if z1 <= z || (z < z1 && z1 - z <= 1) {
-//                     let Weight { w, .. } = *weights[&p].borrow();
-//                     let p1 = (*r, *c);
-//                     let w1 = weights.entry(p1).or_insert(RefCell::new(Weight {
-//                         pos: p1,
-//                         w: w + 1,
-//                     }));
-//                     let new_w = (w + 1).min(w1.borrow().w);
-//                     w1.borrow_mut().w = new_w;
-//                     if !visited.contains(&p1) {
-//                         return Some(*w1);
-//                     }
-//                 }
-//             }
-//             None
-//         });
-//         for v in to_visit {
-//             stack.push(v);
-//         }
-//     }
-//     weights[&end].borrow().w
-
 fn walk(map: &Vec<Vec<u32>>, start: &(usize, usize), end: &(usize, usize)) -> u32 {
     let r_l = map.len();
     let c_l = map[0].len();

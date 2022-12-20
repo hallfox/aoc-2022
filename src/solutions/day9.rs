@@ -2,9 +2,7 @@ use anyhow::Result;
 
 use itertools::Itertools;
 use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
-    path::PathBuf,
+    collections::{HashSet},
 };
 
 type Pair<T> = (T, T);
@@ -61,7 +59,7 @@ pub fn day9(input: &str) -> Result<()> {
             let c = m;
             ts[0] = t_add(ts[0], c);
             for t in 1..l {
-                let v = ts[t];
+                let _v = ts[t];
                 if ts[h].0.abs_diff(ts[t].0) > 1 && ts[h].1.abs_diff(ts[t].1) > 1 {
                     ts[t].0 = ts[h].0 - (ts[h].0 - ts[t].0).signum();
                     ts[t].1 = ts[h].1 - (ts[h].1 - ts[t].1).signum();

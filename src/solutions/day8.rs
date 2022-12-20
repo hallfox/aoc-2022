@@ -1,11 +1,6 @@
 use anyhow::Result;
 
-use itertools::Itertools;
-use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
-    path::PathBuf,
-};
+use std::collections::HashSet;
 
 pub fn day8(input: &str) -> Result<()> {
     let ts: Vec<_> = input

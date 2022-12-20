@@ -1,12 +1,7 @@
 use anyhow::Result;
 
-use itertools::Itertools;
 use regex::Regex;
-use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
-    path::PathBuf,
-};
+use std::{collections::HashMap, path::PathBuf};
 
 fn dir_size(tree: &HashMap<PathBuf, Vec<Vec<&str>>>, d: &PathBuf) -> usize {
     let cd = tree.get(d).unwrap();
@@ -59,7 +54,11 @@ pub fn day7(input: &str) -> Result<()> {
     println!("{}", solt1);
 
     let free = 70000000 - szs.get(&PathBuf::from("/")).unwrap();
-    let solt2 = szs.values().filter(|&x| x + free >= 30000000).min().unwrap();
+    let solt2 = szs
+        .values()
+        .filter(|&x| x + free >= 30000000)
+        .min()
+        .unwrap();
     println!("{}", solt2);
 
     Ok(())

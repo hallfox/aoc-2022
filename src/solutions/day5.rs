@@ -1,12 +1,6 @@
 use anyhow::Result;
 
-use itertools::Itertools;
 use regex::Regex;
-use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
-    path::PathBuf,
-};
 
 fn parse_crate<I: Iterator>(inp: &mut I) -> Option<I::Item> {
     let mut res = None;

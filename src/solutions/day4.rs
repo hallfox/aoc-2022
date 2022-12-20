@@ -1,12 +1,6 @@
 use anyhow::Result;
 
-use itertools::Itertools;
-use regex::Regex;
-use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
-    path::PathBuf, ops::Range,
-};
+use std::ops::Range;
 
 pub fn day4(input: &str) -> Result<()> {
     let ids: Vec<_> = input

@@ -13,4 +13,3 @@ fn paths<T>(xs: &Vec<Vec<T>>, p: &(usize, usize)) -> impl Iterator {
         .chain((j + 1..n).map(move |a| (i, a)))
         .chain((0..j).rev().map(move |a| (i, a)))
 }
-

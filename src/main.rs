@@ -1,6 +1,6 @@
+use clap::Parser;
 use std::io;
 use std::io::Read;
-use clap::Parser;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -30,6 +30,12 @@ fn main() {
         advent2022::day11,
         advent2022::day12,
         advent2022::day13,
+        advent2022::day14,
+        advent2022::day15,
+        advent2022::day16,
+        advent2022::day17,
+        advent2022::day18,
+        advent2022::day19,
     ];
 
     let solver = solvers[args.day - 1];

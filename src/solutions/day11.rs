@@ -2,9 +2,8 @@ use anyhow::Result;
 
 use itertools::Itertools;
 use std::{
-    collections::{HashMap, HashSet, VecDeque},
+    collections::{VecDeque},
     iter,
-    path::{PathBuf},
 };
 
 #[derive(Debug, Clone)]

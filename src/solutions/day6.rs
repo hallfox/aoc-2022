@@ -1,10 +1,8 @@
 use anyhow::Result;
 
-use itertools::Itertools;
+
 use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
-    path::PathBuf,
+    collections::{HashSet},
 };
 
 pub fn day6(input: &str) -> Result<()> {

@@ -1,11 +1,7 @@
 use anyhow::Result;
 
 use itertools::Itertools;
-use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    iter,
-    path::PathBuf,
-};
+use std::iter;
 
 enum Op {
     Noop,
@@ -17,7 +13,6 @@ struct Program(Vec<Op>);
 impl Program {
     fn run(&self) -> Vec<i32> {
         let mut x = 1;
-        let mut n = 1;
         let mut states = vec![x];
         for i in &self.0 {
             match *i {
@@ -28,7 +23,6 @@ impl Program {
                     states.push(x);
                     x += a;
                     states.push(x);
-                    n += 2;
                 }
             }
         }
